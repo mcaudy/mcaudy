@@ -1,0 +1,16 @@
+os: linux
+dist: xenial
+services:
+  - docker
+language: python
+python:
+  - "3.6"
+install:
+  - if [[ -n "${DOCKERHUB_TOKEN:-}" ]]; then docker login -u nextstrainbot --password-stdin <<<"$DOCKERHUB_TOKEN"; fi
+  - pip3 install git+https://github.com/nextstrain/cli
+  - nextstrain version
+  - nextstrain check-setup
+  - nextstrain update
+script:
+  - gunzip data/example_sequences.fasta.gz
+  - nextstrain build . all_regions -j 2 --profile nextstrain_profiles/nextstrain-ci
